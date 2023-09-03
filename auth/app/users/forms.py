@@ -14,6 +14,15 @@ class SignUpForm(UserCreationForm):
         model = User
         fields = ('email', 'password1', 'password2', 'first_name', 'last_name', 'bio', 'role')
 
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        if user.role == UserRole.MANAGER:
+            user.is_staff = True
+            user.is_superuser = True
+        if commit:
+            user.save()
+        return user
+
 
 class LoginForm(forms.Form):
     email = forms.EmailField(max_length=255, required=True, help_text='Required. Enter your registered email address.')

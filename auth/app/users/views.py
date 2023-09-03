@@ -59,7 +59,14 @@ def edit_user(request, user_id):
     if request.method == 'POST':
         form = UserEditForm(request.POST, instance=user)
         if form.is_valid():
-            form.save()
+            updated_user = form.save(commit=False)
+            if updated_user.role == UserRole.MANAGER:
+                updated_user.is_staff = True
+                updated_user.is_superuser = True
+            else:
+                updated_user.is_staff = False
+                updated_user.is_superuser = False
+            updated_user.save()
             return redirect('main_page')
     else:
         form = UserEditForm(instance=user)
